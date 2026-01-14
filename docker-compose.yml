@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  fineract-db:
+    image: mariadb:10.6
+    container_name: fineract-db
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - fineract-db-data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+    networks:
+      - fineract-network
+
+  fineract-provider:
+    image: ghcr.io/kaycodedev/fineract:latest
+    container_name: fineract-provider
+    # restart: always
+    ports:
+      - "8443:8443"
+    depends_on:
+      - fineract-db
+    environment:
+      - FINERACT_HIKARI_JDBC_URL=jdbc:mariadb://fineract-db:3306/fineract_tenants
+      - FINERACT_HIKARI_USERNAME=${DB_USER}
+      - FINERACT_HIKARI_PASSWORD=${DB_PASSWORD}
+      - FINERACT_DEFAULT_TENANTDB_HOSTNAME=fineract-db
+      - FINERACT_DEFAULT_TENANTDB_PORT=3306
+      - FINERACT_DEFAULT_TENANTDB_UID=${DB_USER}
+      - FINERACT_DEFAULT_TENANTDB_PWD=${DB_PASSWORD}
+      - FINERACT_DEFAULT_TENANTDB_NAME=fineract_default
+      - FINERACT_DEFAULT_TENANT_IDENTIFIER=default
+    networks:
+      - fineract-network
+
+  fineract-web:
+    image: ghcr.io/kaycodedev/fineract-web-app:latest
+    container_name: fineract-web
+    restart: always
+    ports:
+      - "8444:80"
+    environment:
+      - FINERACT_API_URL=https://localhost:8443
+      - FINERACT_PLATFORM_TENANT_IDENTIFIER=default
+    networks:
+      - fineract-network
+
+volumes:
+  fineract-db-data:
+
+networks:
+  fineract-network:
+    driver: bridge
