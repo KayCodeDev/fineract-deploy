@@ -20,6 +20,7 @@ services:
     container_name: fineract-provider
     # restart: always
     ports:
+      - "8080:8080"
       - "8443:8443"
     depends_on:
       - fineract-db
