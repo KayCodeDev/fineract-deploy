@@ -43,7 +43,7 @@ services:
     ports:
       - "8444:80"
     environment:
-      - FINERACT_API_URL=https://206.189.50.30:8443
+      - FINERACT_API_URL=${FINERACT_API_URL}
       - FINERACT_PLATFORM_TENANT_IDENTIFIER=default
     networks:
       - fineract-network
