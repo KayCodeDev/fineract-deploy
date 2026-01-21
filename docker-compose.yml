@@ -17,6 +17,7 @@ services:
 
   fineract-provider:
     image: ghcr.io/kaycodedev/fineract:latest
+    pull_policy: always
     container_name: fineract-provider
     # restart: always
     ports:
@@ -41,6 +42,7 @@ services:
 
   fineract-web:
     image: ghcr.io/kaycodedev/fineract-web-app:latest
+    pull_policy: always
     container_name: fineract-web
     restart: always
     ports:
